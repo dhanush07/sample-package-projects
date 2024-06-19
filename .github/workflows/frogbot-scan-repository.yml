@@ -1,19 +1,18 @@
 name: "Frogbot Scan Repository"
 on:
   workflow_dispatch:
-  #schedule:
+  #schedule: "0 0 * * *"
     # The repository will be scanned once a day at 00:00 GMT.
-  #  - cron: "0 0 * * *"
+    #- cron: "0 0 * * *"
 permissions:
   contents: write
   pull-requests: write
   security-events: write
   # [Mandatory If using OIDC authentication protocol instead of JF_ACCESS_TOKEN]
-  #id-token: write
+  # id-token: write
 jobs:
   scan-repository:
     runs-on: ubuntu-latest
-    name: Scan Repository (${{ matrix.branch }} branch)
     strategy:
       matrix:
         # The repository scanning will be triggered periodically on the following branches.
@@ -27,7 +26,7 @@ jobs:
 
           # [Mandatory if JF_USER and JF_PASSWORD are not provided]
           # JFrog access token with 'read' permissions on Xray service
-          JF_ACCESS_TOKEN: ${{ secrets.ARTIFACTORY_ACCESS_TOKEN }}
+          JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
 
           # [Mandatory if JF_ACCESS_TOKEN is not provided]
           # JFrog username with 'read' permissions for Xray. Must be provided with JF_PASSWORD
@@ -72,11 +71,11 @@ jobs:
 
           # [Optional, default: "."]
           # Relative path to the root of the project in the Git repository. If left empty (without providing "." yourself as default), a recursive scan is triggered from the root directory of the project.
-          JF_WORKING_DIR: ./npm/
+          # JF_WORKING_DIR: path/to/project/dir
 
           # [Default: "*git*;*node_modules*;*target*;*venv*;*test*"]
           # List of exclusion patterns (utilizing wildcards) for excluding paths in the source code of the Git repository during SCA scans.
-          JF_PATH_EXCLUSIONS: "*git*;*node_modules*;*target*;*venv*;*test*"
+          # JF_PATH_EXCLUSIONS: "*git*;*node_modules*;*target*;*venv*;*test*"
 
           # [Optional]
           # Xray Watches. Learn more about them here: https://www.jfrog.com/confluence/display/JFROG/Configuring+Xray+Watches
@@ -84,11 +83,11 @@ jobs:
 
           # [Optional]
           # JFrog project. Learn more about it here: https://www.jfrog.com/confluence/display/JFROG/Projects
-          JF_PROJECT: ${{ vars.JF_PROJECT_KEY }}
+          # JF_PROJECT: <project-key>
 
           # [Optional, default: "TRUE"]
           # Fails the Frogbot task if any security issue is found.
-          JF_FAIL: "FALSE"
+          # JF_FAIL: "FALSE"
 
           # [Optional]
           # Frogbot will download the project dependencies, if they're not cached locally. To download the
@@ -146,5 +145,5 @@ jobs:
 
         # [Mandatory if using OIDC authentication protocol instead of JF_ACCESS_TOKEN]
         # Insert to oidc-provider-name the 'Provider Name' defined in the OIDC integration configured in the JPD
-        #with:
-           #oidc-provider-name: jfrog-github-oidc
+        # with:
+        #   oidc-provider-name: ""
